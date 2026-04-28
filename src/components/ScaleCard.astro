@@ -1,0 +1,15 @@
+---
+import type { Scale } from '../data/scales';
+const { scale } = Astro.props as { scale: Scale };
+---
+
+<a
+  href={`/reference/${scale.slug}`}
+  class="block p-5 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] hover:shadow-sm hover:-translate-y-0.5 transition-all"
+>
+  <h3 class="font-serif font-bold text-[var(--color-text)] mb-1">{scale.title}</h3>
+  <p class="text-sm text-[var(--color-text-secondary)] leading-relaxed line-clamp-2">{scale.description}</p>
+  <span class="inline-block mt-3 text-xs px-2 py-0.5 rounded-full bg-[var(--color-bg)] border border-[var(--color-border)] text-[var(--color-text-secondary)]">
+    {scale.specialty}
+  </span>
+</a>

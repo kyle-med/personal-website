@@ -1,0 +1,107 @@
+---
+import Layout from '../../components/Layout.astro';
+import { scales } from '../../data/scales';
+import GcsComaScale from '../../components/scales/GcsComaScale.astro';
+
+export function getStaticPaths() {
+  return scales.map((scale) => ({ params: { slug: scale.slug }, props: { scale } }));
+}
+
+const { scale } = Astro.props;
+
+const ScaleComponent = scale.slug === 'gcs-coma-scale' ? GcsComaScale : null;
+---
+
+<Layout title={`${scale.title} — Bedside Reference`} description={scale.description}>
+  <article class="max-w-3xl mx-auto px-6 py-16">
+    <a href="/reference" class="text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-accent)] transition-colors mb-6 inline-block">&larr; Back to Reference</a>
+
+    <header class="mb-8">
+      <h1 class="font-serif text-3xl md:text-4xl font-extrabold text-[var(--color-text)] mb-3">{scale.title}</h1>
+      <div class="flex flex-wrap items-center gap-3 text-sm text-[var(--color-text-secondary)]">
+        <span class="text-xs px-2 py-0.5 rounded-full bg-[var(--color-bg)] border border-[var(--color-border)]">
+          {scale.specialty}
+        </span>
+      </div>
+    </header>
+
+    <div class="mb-10">
+      {ScaleComponent && <ScaleComponent />}
+    </div>
+  </article>
+</Layout>
+
+<script src="https://unpkg.com/vue@3/dist/vue.global.js" is:inline></script>
+
+<script>
+  import { createApp, reactive, computed } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js';
+
+  const mountEl = document.getElementById('gcs-app');
+  if (mountEl) {
+    createApp({
+      setup() {
+        const scores = reactive({
+          e: 4,
+          v: 5,
+          m: 6,
+        });
+
+        const options = {
+          eye: [
+            { text: '自动睁眼', val: 4 },
+            { text: '呼唤睁眼', val: 3 },
+            { text: '刺痛睁眼', val: 2 },
+            { text: '无反应', val: 1 },
+          ],
+          verbal: [
+            { text: '回答准确', val: 5 },
+            { text: '回答错误', val: 4 },
+            { text: '胡言乱语', val: 3 },
+            { text: '仅能发音', val: 2 },
+            { text: '无反应', val: 1 },
+          ],
+          motor: [
+            { text: '按指令动作', val: 6 },
+            { text: '对刺痛能定位', val: 5 },
+            { text: '刺痛时肢体回避', val: 4 },
+            { text: '刺痛时肢体屈曲', val: 3 },
+            { text: '刺痛时肢体伸直', val: 2 },
+            { text: '无反应', val: 1 },
+          ],
+        };
+
+        const totalScore = computed(() => scores.e + scores.v + scores.m);
+
+        const scoreColor = computed(() =>
+          totalScore.value <= 8
+            ? 'mt-10 p-8 rounded-3xl text-center shadow-lg transition-all duration-500 bg-red-500 text-white shadow-red-200'
+            : 'mt-10 p-8 rounded-3xl text-center shadow-lg transition-all duration-500 bg-blue-600 text-white shadow-blue-200'
+        );
+
+        function selectedClass(score, val) {
+          const base = 'px-5 py-4 flex justify-between items-center ios-btn border-b border-gray-50 last:border-0';
+          return score === val ? base + ' bg-blue-50' : base;
+        }
+
+        function scoreClass(score, val) {
+          return score === val ? 'text-sm text-blue-600 font-bold' : 'text-sm text-gray-400';
+        }
+
+        return { scores, options, totalScore, scoreColor, selectedClass, scoreClass };
+      },
+    }).mount('#gcs-app');
+  }
+</script>
+
+<style>
+  .ios-btn {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .ios-btn:active {
+    transform: scale(0.96);
+    opacity: 0.7;
+  }
+  input[type="radio"] {
+    display: none;
+  }
+</style>

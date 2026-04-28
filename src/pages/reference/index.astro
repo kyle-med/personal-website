@@ -1,0 +1,121 @@
+---
+import Layout from '../../components/Layout.astro';
+import ScaleCard from '../../components/ScaleCard.astro';
+import { scales, specialties } from '../../data/scales';
+
+const activeSpecialty = Astro.url.searchParams.get('specialty');
+const filtered = activeSpecialty
+  ? scales.filter((s) => s.specialty === activeSpecialty)
+  : scales;
+---
+
+<Layout title="Bedside Reference — Hoikei Chan" description="A curated collection of essential medical scales for clinical rotations">
+  <section class="max-w-3xl mx-auto px-6 py-16">
+    <h1 class="font-serif text-3xl font-extrabold text-[var(--color-text)] mb-2">Bedside Reference</h1>
+    <p class="text-sm font-medium text-[var(--color-accent)] mb-2">Your digital companion for clinical rotations</p>
+    <p class="text-[var(--color-text-secondary)] mb-8">
+      A curated collection of essential medical scales frequently used during ward rounds and clinical practice.
+      Organized by specialty, this module ensures you have the most reliable assessment tools ready whenever you need them at the bedside.
+    </p>
+
+    <div id="search" class="mb-6"></div>
+
+    <div class="flex flex-wrap gap-2 mb-8">
+      <a
+        href="/reference"
+        class={`text-sm px-3 py-1 rounded-full border transition-colors ${
+          activeSpecialty === null
+            ? 'bg-[var(--color-accent)] text-white border-[var(--color-accent)]'
+            : 'bg-[var(--color-surface)] text-[var(--color-text-secondary)] border-[var(--color-border)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]'
+        }`}
+      >
+        All
+      </a>
+      {specialties.map((sp) => (
+        <a
+          href={`/reference?specialty=${encodeURIComponent(sp)}`}
+          class={`text-sm px-3 py-1 rounded-full border transition-colors ${
+            activeSpecialty === sp
+              ? 'bg-[var(--color-accent)] text-white border-[var(--color-accent)]'
+              : 'bg-[var(--color-surface)] text-[var(--color-text-secondary)] border-[var(--color-border)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]'
+          }`}
+        >
+          {sp}
+        </a>
+      ))}
+    </div>
+
+    {
+      filtered.length === 0 ? (
+        <p class="text-[var(--color-text-secondary)] py-12 text-center">No scales found for this specialty.</p>
+      ) : (
+        <div class="grid gap-4">
+          {filtered.map((scale) => <ScaleCard scale={scale} />)}
+        </div>
+      )
+    }
+  </section>
+</Layout>
+
+<script is:inline>
+  (async () => {
+    try {
+      const pagefind = await import('/pagefind/pagefind.js');
+      await pagefind.init();
+      new pagefind.SearchBox({
+        element: '#search',
+        placeholder: 'Search scales...',
+        baseUrl: '/',
+        bundlePath: '/pagefind/',
+        showImages: false,
+        showSubResults: false,
+      });
+    } catch (e) {
+      const el = document.querySelector('#search');
+      if (el) el.innerHTML =
+        '<input type="text" placeholder="Search available after build..." class="w-full px-4 py-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] text-sm text-[var(--color-text-secondary)]" disabled />';
+    }
+  })();
+</script>
+
+<style is:inline>
+  .pagefind-modular-input {
+    width: 100%;
+    padding: 0.625rem 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    font-size: 0.875rem;
+    color: var(--color-text);
+    font-family: inherit;
+  }
+  .pagefind-modular-input:focus {
+    outline: 2px solid var(--color-accent);
+    outline-offset: -1px;
+  }
+  .pagefind-modular-list {
+    margin-top: 0.5rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    overflow: hidden;
+  }
+  .pagefind-modular-list-link {
+    display: block;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--color-border);
+    transition: background 0.15s;
+  }
+  .pagefind-modular-list-link:last-child {
+    border-bottom: none;
+  }
+  .pagefind-modular-list-link:hover {
+    background: var(--color-bg);
+  }
+  .pagefind-modular-list-link mark {
+    background: #bbf7d0;
+    color: inherit;
+    border-radius: 2px;
+    padding: 0 2px;
+  }
+</style>
