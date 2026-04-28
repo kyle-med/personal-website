@@ -1,0 +1,29 @@
+---
+import Layout from '../components/Layout.astro';
+---
+
+<Layout title="About — Hoikei Chan" description="About me, research interests, and contact">
+  <section class="max-w-3xl mx-auto px-6 py-16">
+    <h1 class="font-serif text-3xl font-extrabold text-[var(--color-text)] mb-8">About</h1>
+
+    <div class="prose-custom prose prose-slate max-w-none space-y-6">
+      <p class="text-lg text-[var(--color-text-secondary)] leading-relaxed">
+        Hi, I'm Hoikei Chan. I'm interested in deep learning, computer vision, and cognitive science.
+        This site is where I share notes on papers I read and track my academic progress.
+      </p>
+
+      <h2 class="font-serif text-xl font-bold text-[var(--color-text)] mt-10 mb-4">Research Interests</h2>
+      <ul class="list-disc pl-5 text-[var(--color-text-secondary)] space-y-2">
+        <li>Deep Learning — architectures, training dynamics, representation learning</li>
+        <li>Computer Vision — image recognition, object detection, generative models</li>
+        <li>Cognitive Science — attention mechanisms, memory systems, neural correlates</li>
+      </ul>
+
+      <h2 class="font-serif text-xl font-bold text-[var(--color-text)] mt-10 mb-4">Contact</h2>
+      <p class="text-[var(--color-text-secondary)]">
+        GitHub: <a href="https://github.com/hoikei" class="text-[var(--color-accent)] hover:text-[var(--color-accent-hover)]">@hoikei</a><br />
+        Email: <a href="mailto:hoikei.chan@academic.org" class="text-[var(--color-accent)] hover:text-[var(--color-accent-hover)]">hoikei.chan@academic.org</a>
+      </p>
+    </div>
+  </section>
+</Layout>
