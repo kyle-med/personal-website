@@ -1,0 +1,28 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+const { note } = Astro.props as { note: CollectionEntry<'notes'> };
+---
+
+<a
+  href={`/notes/${note.slug}`}
+  class="block p-5 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] hover:shadow-sm hover:-translate-y-0.5 transition-all"
+>
+  <div class="flex items-start justify-between gap-4 mb-2">
+    <h3 class="font-serif font-bold text-[var(--color-text)]">{note.data.title}</h3>
+    {note.data.rating && (
+      <span class="text-sm text-[var(--color-accent)] whitespace-nowrap">{'★'.repeat(note.data.rating)}{'☆'.repeat(5 - note.data.rating)}</span>
+    )}
+  </div>
+  <p class="text-sm text-[var(--color-text-secondary)] mb-3">
+    {note.data.journal} ({note.data.year}) &middot; {note.data.authors}
+  </p>
+  <p class="text-sm text-[var(--color-text-secondary)] leading-relaxed line-clamp-2">{note.data.abstract}</p>
+  <div class="flex flex-wrap gap-2 mt-3">
+    {note.data.tags.map((tag) => (
+      <span class="text-xs px-2 py-0.5 rounded-full bg-[var(--color-bg)] border border-[var(--color-border)] text-[var(--color-text-secondary)]">
+        {tag}
+      </span>
+    ))}
+  </div>
+</a>

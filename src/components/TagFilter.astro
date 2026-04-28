@@ -1,0 +1,28 @@
+---
+const { tags, activeTag } = Astro.props as { tags: string[]; activeTag: string | null };
+---
+
+<div class="flex flex-wrap gap-2 mb-6">
+  <a
+    href="/notes"
+    class={`text-sm px-3 py-1 rounded-full border transition-colors ${
+      activeTag === null
+        ? 'bg-[var(--color-accent)] text-white border-[var(--color-accent)]'
+        : 'bg-[var(--color-surface)] text-[var(--color-text-secondary)] border-[var(--color-border)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]'
+    }`}
+  >
+    All
+  </a>
+  {tags.map((tag) => (
+    <a
+      href={`/notes?tag=${encodeURIComponent(tag)}`}
+      class={`text-sm px-3 py-1 rounded-full border transition-colors ${
+        activeTag === tag
+          ? 'bg-[var(--color-accent)] text-white border-[var(--color-accent)]'
+          : 'bg-[var(--color-surface)] text-[var(--color-text-secondary)] border-[var(--color-border)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]'
+      }`}
+    >
+      {tag}
+    </a>
+  ))}
+</div>
