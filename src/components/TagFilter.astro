@@ -1,19 +1,15 @@
 ---
-const { tags, activeTag, gridId } = Astro.props as { tags: string[]; activeTag: string | null; gridId: string };
+const { tags, gridId } = Astro.props as { tags: string[]; activeTag: string | null; gridId: string };
+
+const filterId = gridId + '-tagfilter';
 ---
 
-<div class="flex flex-wrap gap-2 mb-6 tag-filter-container">
-  <button data-tag="" class="tag-btn text-sm px-3 py-1 rounded-full border transition-colors {activeTag === null
-    ? 'bg-[var(--color-accent)] text-white border-[var(--color-accent)]'
-    : 'bg-[var(--color-surface)] text-[var(--color-text-secondary)] border-[var(--color-border)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]'
-  }">
+<div id={filterId} class="flex flex-wrap gap-2 mb-6">
+  <button data-tag="" class="filter-btn text-sm px-3 py-1 rounded-full border cursor-pointer transition-colors" style="background:var(--color-accent);color:#fff;border-color:var(--color-accent)">
     All
   </button>
   {tags.map((tag) => (
-    <button data-tag={tag} class="tag-btn text-sm px-3 py-1 rounded-full border transition-colors {activeTag === tag
-      ? 'bg-[var(--color-accent)] text-white border-[var(--color-accent)]'
-      : 'bg-[var(--color-surface)] text-[var(--color-text-secondary)] border-[var(--color-border)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]'
-    }">
+    <button data-tag={tag} class="filter-btn text-sm px-3 py-1 rounded-full border cursor-pointer transition-colors" style="background:var(--color-surface);color:var(--color-text-secondary);border-color:var(--color-border)">
       {tag}
     </button>
   ))}
@@ -21,11 +17,17 @@ const { tags, activeTag, gridId } = Astro.props as { tags: string[]; activeTag: 
 
 <script is:inline>
   (function () {
-    const container = document.currentScript.previousElementSibling;
+    const FILTER_ID = '{filterId}';
+    const GRID_ID = '{gridId}';
+
+    const container = document.getElementById(FILTER_ID);
     if (!container) return;
-    const buttons = container.querySelectorAll('.tag-btn');
-    const grid = document.getElementById('{gridId}');
+    const buttons = container.querySelectorAll('.filter-btn');
+    const grid = document.getElementById(GRID_ID);
     if (!grid) return;
+
+    const ACTIVE_STYLE = 'background:var(--color-accent);color:#fff;border-color:var(--color-accent)';
+    const INACTIVE_STYLE = 'background:var(--color-surface);color:var(--color-text-secondary);border-color:var(--color-border)';
 
     function filter(tag) {
       const cards = grid.querySelectorAll('[data-tags]');
@@ -38,23 +40,23 @@ const { tags, activeTag, gridId } = Astro.props as { tags: string[]; activeTag: 
       });
 
       buttons.forEach((btn) => {
-        const isActive = btn.dataset.tag === tag;
-        btn.className = isActive
-          ? 'tag-btn text-sm px-3 py-1 rounded-full border transition-colors bg-[var(--color-accent)] text-white border-[var(--color-accent)]'
-          : 'tag-btn text-sm px-3 py-1 rounded-full border transition-colors bg-[var(--color-surface)] text-[var(--color-text-secondary)] border-[var(--color-border)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]';
+        btn.style.cssText = (btn.dataset.tag === tag ? ACTIVE_STYLE : INACTIVE_STYLE)
+          + ';border-radius:9999px;padding:4px 12px;font-size:0.875rem;cursor:pointer';
       });
 
-      const url = new URL(window.location);
+      var url = new URL(window.location);
       if (tag) { url.searchParams.set('tag', tag); }
       else { url.searchParams.delete('tag'); }
       window.history.replaceState({}, '', url);
     }
 
-    buttons.forEach((btn) => {
-      btn.addEventListener('click', () => filter(btn.dataset.tag || ''));
+    buttons.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        filter(btn.getAttribute('data-tag') || '');
+      });
     });
 
-    const active = new URLSearchParams(window.location.search).get('tag') || '';
+    var active = new URLSearchParams(window.location.search).get('tag') || '';
     filter(active);
   })();
 </script>
