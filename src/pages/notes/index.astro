@@ -11,10 +11,10 @@ const allNotes = (await getCollection('notes', ({ data }) => !data.draft))
 const allTags = [...new Set(allNotes.flatMap((n) => n.data.tags))].sort();
 ---
 
-<Layout title="Academic Notes — Hoikei Chan" description="Notes on academic papers and journals">
+<Layout title="Thinking &amp; Notes — Hoikei Chan" description="Research thoughts, interesting findings, and what I learned">
   <section class="max-w-3xl mx-auto px-6 py-16">
-    <h1 class="font-serif text-3xl font-extrabold text-[var(--color-text)] mb-2">Academic Notes</h1>
-    <p class="text-[var(--color-text-secondary)] mb-8">Notes and commentary on papers I read</p>
+    <h1 class="font-serif text-3xl font-extrabold text-[var(--color-text)] mb-2">Thinking &amp; Notes</h1>
+    <p class="text-[var(--color-text-secondary)] mb-8">Interesting findings, strategies and what I learned</p>
 
     <SearchBox />
     <TagFilter tags={allTags} activeTag={null} gridId="notes-grid" />
