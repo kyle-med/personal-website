@@ -17,7 +17,7 @@ const latestNotes = (await getCollection('notes', ({ data }) => !data.draft))
       Sharing academic journal notes and tracking my progress.
     </p>
 
-    <div class="grid sm:grid-cols-2 gap-4 mb-20">
+    <div class="grid sm:grid-cols-3 gap-4 mb-20">
       <a href="/notes" class="block p-6 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] hover:shadow-md hover:-translate-y-0.5 transition-all">
         <div class="text-sm font-bold uppercase tracking-wider text-[var(--color-accent)] mb-2">Thinking &amp; Notes</div>
         <h2 class="font-serif text-xl font-bold text-[var(--color-text)] mb-1">Research Thoughts</h2>
@@ -27,6 +27,11 @@ const latestNotes = (await getCollection('notes', ({ data }) => !data.draft))
         <div class="text-sm font-bold uppercase tracking-wider text-[var(--color-accent)] mb-2">Achievements</div>
         <h2 class="font-serif text-xl font-bold text-[var(--color-text)] mb-1">Progress Log</h2>
         <p class="text-sm text-[var(--color-text-secondary)]">My journey at the intersection of AI and medicine</p>
+      </a>
+      <a href="/reference" class="block p-6 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] hover:shadow-md hover:-translate-y-0.5 transition-all">
+        <div class="text-sm font-bold uppercase tracking-wider text-[var(--color-accent)] mb-2">Bedside Reference</div>
+        <h2 class="font-serif text-xl font-bold text-[var(--color-text)] mb-1">Clinical Tools</h2>
+        <p class="text-sm text-[var(--color-text-secondary)]">Essential medical scales for ward rounds and clinical practice</p>
       </a>
     </div>
 
