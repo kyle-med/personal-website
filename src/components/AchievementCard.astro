@@ -1,0 +1,38 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+const { achievement } = Astro.props as { achievement: CollectionEntry<'achievements'> };
+
+const typeLabel: Record<string, string> = {
+  paper: 'Paper',
+  project: 'Project',
+  talk: 'Talk',
+  award: 'Award',
+  milestone: 'Milestone',
+};
+
+const typeColor: Record<string, string> = {
+  paper: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  project: 'bg-blue-50 text-blue-700 border-blue-200',
+  talk: 'bg-purple-50 text-purple-700 border-purple-200',
+  award: 'bg-amber-50 text-amber-700 border-amber-200',
+  milestone: 'bg-slate-100 text-slate-600 border-slate-200',
+};
+---
+
+<a
+  href={`/achievements/${achievement.id}`}
+  class="block p-5 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] hover:shadow-sm hover:-translate-y-0.5 transition-all"
+>
+  <div class="flex items-start justify-between gap-4">
+    <div>
+      <h3 class="font-serif font-bold text-[var(--color-text)] mb-1">{achievement.data.title}</h3>
+      <time class="text-sm text-[var(--color-text-secondary)]" datetime={achievement.data.date.toISOString()}>
+        {achievement.data.date.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' })}
+      </time>
+    </div>
+    <span class={`text-xs px-2 py-0.5 rounded-full border ${typeColor[achievement.data.type] || typeColor.milestone}`}>
+      {typeLabel[achievement.data.type] || achievement.data.type}
+    </span>
+  </div>
+</a>
