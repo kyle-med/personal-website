@@ -1,0 +1,75 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&family=Noto+Serif+SC:wght@600;700;900&family=JetBrains+Mono:wght@400;600&display=swap');
+
+@layer base {
+  :root {
+    --color-bg: #f8fafc;
+    --color-surface: #ffffff;
+    --color-text: #0f172a;
+    --color-text-secondary: #475569;
+    --color-accent: #2d6a4f;
+    --color-accent-hover: #1b4332;
+    --color-border: #e2e8f0;
+  }
+
+  .dark {
+    --color-bg: #0f172a;
+    --color-surface: #1e293b;
+    --color-text: #f1f5f9;
+    --color-text-secondary: #94a3b8;
+    --color-accent: #40916c;
+    --color-accent-hover: #52b788;
+    --color-border: #334155;
+  }
+
+  html {
+    font-family: 'Noto Sans SC', system-ui, sans-serif;
+    color: var(--color-text);
+    background-color: var(--color-bg);
+  }
+
+  body {
+    @apply antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Noto Serif SC', Georgia, serif;
+    color: var(--color-text);
+  }
+
+  code, pre {
+    font-family: 'JetBrains Mono', Consolas, monospace;
+  }
+
+  a {
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  a:hover {
+    color: var(--color-accent-hover);
+  }
+}
+
+@layer components {
+  .prose-custom {
+    @apply max-w-none;
+  }
+
+  .prose-custom h1,
+  .prose-custom h2,
+  .prose-custom h3 {
+    font-family: 'Noto Serif SC', Georgia, serif;
+  }
+
+  .prose-custom a {
+    color: var(--color-accent);
+  }
+
+  .prose-custom a:hover {
+    color: var(--color-accent-hover);
+  }
+}
