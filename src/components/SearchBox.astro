@@ -1,28 +1,39 @@
 ---
-// Pagefind search box
-// The pagefind JS/CSS are generated at build time into dist/pagefind/
-// We load them from the pagefind output directory
+// Pagefind modular UI search
+// CSS and JS are generated at build time into dist/pagefind/
 ---
+<link rel="stylesheet" href="/pagefind/pagefind-modular-ui.css" />
+
 <div id="search" class="mb-6"></div>
+<div id="search-results"></div>
 
 <script is:inline>
   (async () => {
     try {
+      await import('/pagefind/pagefind-modular-ui.js');
+
       const pagefind = await import('/pagefind/pagefind.js');
       await pagefind.init();
-      const { SearchBox } = await import('/pagefind/pagefind-modular-ui.js');
-      new SearchBox({
-        element: '#search',
-        placeholder: 'Search notes...',
-        baseUrl: '/',
+
+      const instance = new PagefindModularUI.Instance({
         bundlePath: '/pagefind/',
-        showImages: false,
-        showSubResults: false,
       });
+
+      new PagefindModularUI.Input({
+        containerElement: '#search',
+        instance: instance,
+      });
+
+      new PagefindModularUI.ResultList({
+        containerElement: '#search-results',
+        instance: instance,
+      });
+
     } catch (e) {
+      console.error('Pagefind init failed:', e);
       const el = document.querySelector('#search');
       if (el) el.innerHTML =
-        '<input type="text" placeholder="Search available after build..." class="w-full px-4 py-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] text-sm text-[var(--color-text-secondary)]" disabled />';
+        '<input type="text" placeholder="Search available after build..." disabled class="w-full px-4 py-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] text-sm text-[var(--color-text-secondary)]" />';
     }
   })();
 </script>
@@ -41,6 +52,23 @@
   .pagefind-modular-input:focus {
     outline: 2px solid var(--color-accent);
     outline-offset: -1px;
+  }
+  .pagefind-modular-input-wrapper {
+    position: relative;
+  }
+  .pagefind-modular-input-clear {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--color-text-secondary);
+    font-size: 0.8rem;
+  }
+  .pagefind-modular-input-clear[data-pfmod-suppressed] {
+    display: none;
   }
   .pagefind-modular-list {
     margin-top: 0.5rem;
@@ -66,5 +94,20 @@
     color: inherit;
     border-radius: 2px;
     padding: 0 2px;
+  }
+  .pagefind-modular-list-result {
+    list-style: none;
+  }
+  .pagefind-modular-list-inner {
+    padding: 0.5rem 1rem 0.75rem;
+  }
+  .pagefind-modular-list-title {
+    font-weight: 600;
+    color: var(--color-text);
+  }
+  .pagefind-modular-list-excerpt {
+    font-size: 0.85rem;
+    color: var(--color-text-secondary);
+    margin-top: 0.25rem;
   }
 </style>
