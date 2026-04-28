@@ -10,7 +10,8 @@
     try {
       const pagefind = await import('/pagefind/pagefind.js');
       await pagefind.init();
-      new pagefind.SearchBox({
+      const { SearchBox } = await import('/pagefind/pagefind-modular-ui.js');
+      new SearchBox({
         element: '#search',
         placeholder: 'Search notes...',
         baseUrl: '/',
@@ -19,7 +20,6 @@
         showSubResults: false,
       });
     } catch (e) {
-      // Pagefind not available (dev mode or build without indexing)
       const el = document.querySelector('#search');
       if (el) el.innerHTML =
         '<input type="text" placeholder="Search available after build..." class="w-full px-4 py-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] text-sm text-[var(--color-text-secondary)]" disabled />';
