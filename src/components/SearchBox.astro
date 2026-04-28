@@ -1,113 +1,78 @@
 ---
-// Pagefind modular UI search
-// CSS and JS are generated at build time into dist/pagefind/
+// Custom Pagefind search box — supports Enter key and debounced typing
 ---
-<link rel="stylesheet" href="/pagefind/pagefind-modular-ui.css" />
-
-<div id="search" class="mb-6"></div>
-<div id="search-results"></div>
+<div class="mb-6" id="search-container">
+  <input
+    id="search-input"
+    type="text"
+    placeholder="Search..."
+    class="w-full px-4 py-2.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] text-sm text-[var(--color-text)] font-sans focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:ring-offset-0 transition-shadow"
+    disabled
+  />
+</div>
+<div id="search-results" class="grid gap-2"></div>
 
 <script is:inline>
   (async () => {
+    const input = document.getElementById('search-input');
+    if (!input) return;
+
+    let pagefind = null;
+    let searchId = 0;
+
     try {
-      await import('/pagefind/pagefind-modular-ui.js');
-
-      const pagefind = await import('/pagefind/pagefind.js');
+      pagefind = await import('/pagefind/pagefind.js');
       await pagefind.init();
-
-      const instance = new PagefindModularUI.Instance({
-        bundlePath: '/pagefind/',
-      });
-
-      new PagefindModularUI.Input({
-        containerElement: '#search',
-        instance: instance,
-      });
-
-      new PagefindModularUI.ResultList({
-        containerElement: '#search-results',
-        instance: instance,
-      });
-
+      input.disabled = false;
+      input.placeholder = 'Search...';
     } catch (e) {
-      console.error('Pagefind init failed:', e);
-      const el = document.querySelector('#search');
-      if (el) el.innerHTML =
-        '<input type="text" placeholder="Search available after build..." disabled class="w-full px-4 py-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] text-sm text-[var(--color-text-secondary)]" />';
+      input.placeholder = 'Search available after build...';
+      return;
     }
+
+    const resultsEl = document.getElementById('search-results');
+
+    function renderResults(results) {
+      if (!resultsEl) return;
+      if (!results || results.length === 0) {
+        resultsEl.innerHTML = '';
+        return;
+      }
+      resultsEl.innerHTML = results.map((r) => `
+        <a href="${r.url}" class="block p-4 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] hover:shadow-sm transition-all">
+          <div class="font-medium text-sm text-[var(--color-text)]">${r.meta?.title || r.url}</div>
+          <div class="text-xs text-[var(--color-text-secondary)] mt-1">${r.excerpt || ''}</div>
+        </a>
+      `).join('');
+    }
+
+    async function doSearch(query) {
+      const id = ++searchId;
+      if (!query.trim()) {
+        renderResults([]);
+        return;
+      }
+      const result = await pagefind.search(query);
+      if (id !== searchId) return; // ignore stale results
+      const data = await Promise.all(result.results.map((r) => r.data()));
+      if (id !== searchId) return;
+      renderResults(data);
+    }
+
+    // Debounced search while typing
+    let debounceTimer;
+    input.addEventListener('input', () => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => doSearch(input.value), 300);
+    });
+
+    // Enter triggers immediate search (with composition support for IME)
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.isComposing) {
+        e.preventDefault();
+        clearTimeout(debounceTimer);
+        doSearch(input.value);
+      }
+    });
   })();
 </script>
-
-<style is:inline>
-  .pagefind-modular-input {
-    width: 100%;
-    padding: 0.625rem 1rem;
-    border-radius: 0.5rem;
-    border: 1px solid var(--color-border);
-    background: var(--color-surface);
-    font-size: 0.875rem;
-    color: var(--color-text);
-    font-family: inherit;
-  }
-  .pagefind-modular-input:focus {
-    outline: 2px solid var(--color-accent);
-    outline-offset: -1px;
-  }
-  .pagefind-modular-input-wrapper {
-    position: relative;
-  }
-  .pagefind-modular-input-clear {
-    position: absolute;
-    right: 0.5rem;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: var(--color-text-secondary);
-    font-size: 0.8rem;
-  }
-  .pagefind-modular-input-clear[data-pfmod-suppressed] {
-    display: none;
-  }
-  .pagefind-modular-list {
-    margin-top: 0.5rem;
-    border-radius: 0.5rem;
-    border: 1px solid var(--color-border);
-    background: var(--color-surface);
-    overflow: hidden;
-  }
-  .pagefind-modular-list-link {
-    display: block;
-    padding: 0.75rem 1rem;
-    border-bottom: 1px solid var(--color-border);
-    transition: background 0.15s;
-  }
-  .pagefind-modular-list-link:last-child {
-    border-bottom: none;
-  }
-  .pagefind-modular-list-link:hover {
-    background: var(--color-bg);
-  }
-  .pagefind-modular-list-link mark {
-    background: #bbf7d0;
-    color: inherit;
-    border-radius: 2px;
-    padding: 0 2px;
-  }
-  .pagefind-modular-list-result {
-    list-style: none;
-  }
-  .pagefind-modular-list-inner {
-    padding: 0.5rem 1rem 0.75rem;
-  }
-  .pagefind-modular-list-title {
-    font-weight: 600;
-    color: var(--color-text);
-  }
-  .pagefind-modular-list-excerpt {
-    font-size: 0.85rem;
-    color: var(--color-text-secondary);
-    margin-top: 0.25rem;
-  }
-</style>
