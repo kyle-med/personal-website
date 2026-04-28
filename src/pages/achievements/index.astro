@@ -8,11 +8,6 @@ const allAchievements = (await getCollection('achievements', ({ data }) => !data
 
 const allTypes = [...new Set(allAchievements.map((a) => a.data.type))];
 
-const activeType = Astro.url.searchParams.get('type');
-const filtered = activeType
-  ? allAchievements.filter((a) => a.data.type === activeType)
-  : allAchievements;
-
 const typeLabel: Record<string, string> = {
   paper: 'Papers',
   project: 'Projects',
@@ -27,39 +22,57 @@ const typeLabel: Record<string, string> = {
     <h1 class="font-serif text-3xl font-extrabold text-[var(--color-text)] mb-2">Achievements</h1>
     <p class="text-[var(--color-text-secondary)] mb-8">Papers, projects, talks, and milestones</p>
 
-    <div class="flex flex-wrap gap-2 mb-8">
-      <a
-        href="/achievements"
-        class={`text-sm px-3 py-1 rounded-full border transition-colors ${
-          activeType === null
-            ? 'bg-[var(--color-accent)] text-white border-[var(--color-accent)]'
-            : 'bg-[var(--color-surface)] text-[var(--color-text-secondary)] border-[var(--color-border)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]'
-        }`}
-      >
+    <div id="type-filters" class="flex flex-wrap gap-2 mb-8">
+      <button data-type="" class="type-btn text-sm px-3 py-1 rounded-full border transition-colors bg-[var(--color-accent)] text-white border-[var(--color-accent)]">
         All
-      </a>
+      </button>
       {allTypes.map((t) => (
-        <a
-          href={`/achievements?type=${encodeURIComponent(t)}`}
-          class={`text-sm px-3 py-1 rounded-full border transition-colors ${
-            activeType === t
-              ? 'bg-[var(--color-accent)] text-white border-[var(--color-accent)]'
-              : 'bg-[var(--color-surface)] text-[var(--color-text-secondary)] border-[var(--color-border)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]'
-          }`}
-        >
+        <button data-type={t} class="type-btn text-sm px-3 py-1 rounded-full border transition-colors bg-[var(--color-surface)] text-[var(--color-text-secondary)] border-[var(--color-border)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]">
           {typeLabel[t] || t}
-        </a>
+        </button>
       ))}
     </div>
 
-    {
-      filtered.length === 0 ? (
-        <p class="text-[var(--color-text-secondary)] py-12 text-center">No achievements yet.</p>
-      ) : (
-        <div class="grid gap-4">
-          {filtered.map((a) => <AchievementCard achievement={a} />)}
-        </div>
-      )
+    <div id="achievements-grid" class="grid gap-4">
+      {allAchievements.map((a) => <AchievementCard achievement={a} />)}
+    </div>
+  </section>
+</Layout>
+
+<script is:inline>
+  (function () {
+    const buttons = document.querySelectorAll('#type-filters .type-btn');
+    const cards = document.querySelectorAll('#achievements-grid [data-type]');
+
+    function filter(type) {
+      cards.forEach((card) => {
+        if (!type || card.dataset.type === type) {
+          card.style.display = '';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+
+      buttons.forEach((btn) => {
+        const isActive = btn.dataset.type === type;
+        btn.className = isActive
+          ? 'type-btn text-sm px-3 py-1 rounded-full border transition-colors bg-[var(--color-accent)] text-white border-[var(--color-accent)]'
+          : 'type-btn text-sm px-3 py-1 rounded-full border transition-colors bg-[var(--color-surface)] text-[var(--color-text-secondary)] border-[var(--color-border)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]';
+      });
+
+      const url = new URL(window.location);
+      if (type) { url.searchParams.set('type', type); }
+      else { url.searchParams.delete('type'); }
+      window.history.replaceState({}, '', url);
     }
+
+    buttons.forEach((btn) => {
+      btn.addEventListener('click', () => filter(btn.dataset.type || ''));
+    });
+
+    const active = new URLSearchParams(window.location.search).get('type') || '';
+    filter(active);
+  })();
+</script>
   </section>
 </Layout>

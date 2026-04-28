@@ -9,11 +9,6 @@ const allNotes = (await getCollection('notes', ({ data }) => !data.draft))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 
 const allTags = [...new Set(allNotes.flatMap((n) => n.data.tags))].sort();
-
-const activeTag = Astro.url.searchParams.get('tag');
-const filteredNotes = activeTag
-  ? allNotes.filter((n) => n.data.tags.includes(activeTag))
-  : allNotes;
 ---
 
 <Layout title="Academic Notes — Hoikei Chan" description="Notes on academic papers and journals">
@@ -22,16 +17,10 @@ const filteredNotes = activeTag
     <p class="text-[var(--color-text-secondary)] mb-8">Notes and commentary on papers I read</p>
 
     <SearchBox />
-    <TagFilter tags={allTags} activeTag={activeTag} />
+    <TagFilter tags={allTags} activeTag={null} gridId="notes-grid" />
 
-    {
-      filteredNotes.length === 0 ? (
-        <p class="text-[var(--color-text-secondary)] py-12 text-center">No notes found.</p>
-      ) : (
-        <div class="grid gap-4">
-          {filteredNotes.map((note) => <NoteCard note={note} />)}
-        </div>
-      )
-    }
+    <div id="notes-grid" class="grid gap-4">
+      {allNotes.map((note) => <NoteCard note={note} />)}
+    </div>
   </section>
 </Layout>

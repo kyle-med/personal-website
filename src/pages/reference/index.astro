@@ -1,12 +1,7 @@
 ---
 import Layout from '../../components/Layout.astro';
-import ScaleCard from '../../components/ScaleCard.astro';
+import SearchBox from '../../components/SearchBox.astro';
 import { scales, specialties } from '../../data/scales';
-
-const activeSpecialty = Astro.url.searchParams.get('specialty');
-const filtered = activeSpecialty
-  ? scales.filter((s) => s.specialty === activeSpecialty)
-  : scales;
 ---
 
 <Layout title="Bedside Reference — Hoikei Chan" description="A curated collection of essential medical scales for clinical rotations">
@@ -18,104 +13,78 @@ const filtered = activeSpecialty
       Organized by specialty, this module ensures you have the most reliable assessment tools ready whenever you need them at the bedside.
     </p>
 
-    <div id="search" class="mb-6"></div>
+    <SearchBox />
 
-    <div class="flex flex-wrap gap-2 mb-8">
-      <a
-        href="/reference"
-        class={`text-sm px-3 py-1 rounded-full border transition-colors ${
-          activeSpecialty === null
-            ? 'bg-[var(--color-accent)] text-white border-[var(--color-accent)]'
-            : 'bg-[var(--color-surface)] text-[var(--color-text-secondary)] border-[var(--color-border)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]'
-        }`}
-      >
+    <div id="tag-filters" class="flex flex-wrap gap-2 mb-8">
+      <button data-specialty="" class="tag-btn text-sm px-3 py-1 rounded-full border transition-colors bg-[var(--color-accent)] text-white border-[var(--color-accent)]">
         All
-      </a>
+      </button>
       {specialties.map((sp) => (
-        <a
-          href={`/reference?specialty=${encodeURIComponent(sp)}`}
-          class={`text-sm px-3 py-1 rounded-full border transition-colors ${
-            activeSpecialty === sp
-              ? 'bg-[var(--color-accent)] text-white border-[var(--color-accent)]'
-              : 'bg-[var(--color-surface)] text-[var(--color-text-secondary)] border-[var(--color-border)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]'
-          }`}
-        >
+        <button data-specialty={sp} class="tag-btn text-sm px-3 py-1 rounded-full border transition-colors bg-[var(--color-surface)] text-[var(--color-text-secondary)] border-[var(--color-border)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]">
           {sp}
-        </a>
+        </button>
       ))}
     </div>
 
-    {
-      filtered.length === 0 ? (
-        <p class="text-[var(--color-text-secondary)] py-12 text-center">No scales found for this specialty.</p>
-      ) : (
-        <div class="grid gap-4">
-          {filtered.map((scale) => <ScaleCard scale={scale} />)}
-        </div>
-      )
-    }
+    <div id="scales-grid" class="grid gap-4">
+      {scales.map((scale) => (
+        <a
+          href={`/reference/${scale.slug}`}
+          data-specialty={scale.specialty}
+          class="scale-card block p-5 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] hover:shadow-sm hover:-translate-y-0.5 transition-all"
+        >
+          <h3 class="font-serif font-bold text-[var(--color-text)] mb-1">{scale.title}</h3>
+          <p class="text-sm text-[var(--color-text-secondary)] leading-relaxed line-clamp-2">{scale.description}</p>
+          <span class="inline-block mt-3 text-xs px-2 py-0.5 rounded-full bg-[var(--color-bg)] border border-[var(--color-border)] text-[var(--color-text-secondary)]">
+            {scale.specialty}
+          </span>
+        </a>
+      ))}
+    </div>
   </section>
 </Layout>
 
 <script is:inline>
-  (async () => {
-    try {
-      const pagefind = await import('/pagefind/pagefind.js');
-      await pagefind.init();
-      new pagefind.SearchBox({
-        element: '#search',
-        placeholder: 'Search scales...',
-        baseUrl: '/',
-        bundlePath: '/pagefind/',
-        showImages: false,
-        showSubResults: false,
+  // Client-side tag filtering
+  (function () {
+    const buttons = document.querySelectorAll('#tag-filters .tag-btn');
+    const cards = document.querySelectorAll('.scale-card');
+
+    function filter(specialty) {
+      cards.forEach((card) => {
+        if (!specialty || card.dataset.specialty === specialty) {
+          card.style.display = '';
+        } else {
+          card.style.display = 'none';
+        }
       });
-    } catch (e) {
-      const el = document.querySelector('#search');
-      if (el) el.innerHTML =
-        '<input type="text" placeholder="Search available after build..." class="w-full px-4 py-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] text-sm text-[var(--color-text-secondary)]" disabled />';
+
+      buttons.forEach((btn) => {
+        const isActive = btn.dataset.specialty === specialty;
+        btn.className = isActive
+          ? 'tag-btn text-sm px-3 py-1 rounded-full border transition-colors bg-[var(--color-accent)] text-white border-[var(--color-accent)]'
+          : 'tag-btn text-sm px-3 py-1 rounded-full border transition-colors bg-[var(--color-surface)] text-[var(--color-text-secondary)] border-[var(--color-border)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]';
+      });
+
+      // Update URL without page reload
+      const url = new URL(window.location);
+      if (specialty) {
+        url.searchParams.set('specialty', specialty);
+      } else {
+        url.searchParams.delete('specialty');
+      }
+      window.history.replaceState({}, '', url);
     }
+
+    buttons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        filter(btn.dataset.specialty || '');
+      });
+    });
+
+    // Apply filter from URL on page load
+    const params = new URLSearchParams(window.location.search);
+    const active = params.get('specialty') || '';
+    filter(active);
   })();
 </script>
-
-<style is:inline>
-  .pagefind-modular-input {
-    width: 100%;
-    padding: 0.625rem 1rem;
-    border-radius: 0.5rem;
-    border: 1px solid var(--color-border);
-    background: var(--color-surface);
-    font-size: 0.875rem;
-    color: var(--color-text);
-    font-family: inherit;
-  }
-  .pagefind-modular-input:focus {
-    outline: 2px solid var(--color-accent);
-    outline-offset: -1px;
-  }
-  .pagefind-modular-list {
-    margin-top: 0.5rem;
-    border-radius: 0.5rem;
-    border: 1px solid var(--color-border);
-    background: var(--color-surface);
-    overflow: hidden;
-  }
-  .pagefind-modular-list-link {
-    display: block;
-    padding: 0.75rem 1rem;
-    border-bottom: 1px solid var(--color-border);
-    transition: background 0.15s;
-  }
-  .pagefind-modular-list-link:last-child {
-    border-bottom: none;
-  }
-  .pagefind-modular-list-link:hover {
-    background: var(--color-bg);
-  }
-  .pagefind-modular-list-link mark {
-    background: #bbf7d0;
-    color: inherit;
-    border-radius: 2px;
-    padding: 0 2px;
-  }
-</style>

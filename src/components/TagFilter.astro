@@ -1,28 +1,60 @@
 ---
-const { tags, activeTag } = Astro.props as { tags: string[]; activeTag: string | null };
+const { tags, activeTag, gridId } = Astro.props as { tags: string[]; activeTag: string | null; gridId: string };
 ---
 
-<div class="flex flex-wrap gap-2 mb-6">
-  <a
-    href="/notes"
-    class={`text-sm px-3 py-1 rounded-full border transition-colors ${
-      activeTag === null
-        ? 'bg-[var(--color-accent)] text-white border-[var(--color-accent)]'
-        : 'bg-[var(--color-surface)] text-[var(--color-text-secondary)] border-[var(--color-border)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]'
-    }`}
-  >
+<div class="flex flex-wrap gap-2 mb-6 tag-filter-container">
+  <button data-tag="" class="tag-btn text-sm px-3 py-1 rounded-full border transition-colors {activeTag === null
+    ? 'bg-[var(--color-accent)] text-white border-[var(--color-accent)]'
+    : 'bg-[var(--color-surface)] text-[var(--color-text-secondary)] border-[var(--color-border)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]'
+  }">
     All
-  </a>
+  </button>
   {tags.map((tag) => (
-    <a
-      href={`/notes?tag=${encodeURIComponent(tag)}`}
-      class={`text-sm px-3 py-1 rounded-full border transition-colors ${
-        activeTag === tag
-          ? 'bg-[var(--color-accent)] text-white border-[var(--color-accent)]'
-          : 'bg-[var(--color-surface)] text-[var(--color-text-secondary)] border-[var(--color-border)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]'
-      }`}
-    >
+    <button data-tag={tag} class="tag-btn text-sm px-3 py-1 rounded-full border transition-colors {activeTag === tag
+      ? 'bg-[var(--color-accent)] text-white border-[var(--color-accent)]'
+      : 'bg-[var(--color-surface)] text-[var(--color-text-secondary)] border-[var(--color-border)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]'
+    }">
       {tag}
-    </a>
+    </button>
   ))}
 </div>
+
+<script is:inline>
+  (function () {
+    const container = document.currentScript.previousElementSibling;
+    if (!container) return;
+    const buttons = container.querySelectorAll('.tag-btn');
+    const grid = document.getElementById('{gridId}');
+    if (!grid) return;
+
+    function filter(tag) {
+      const cards = grid.querySelectorAll('[data-tags]');
+      cards.forEach((card) => {
+        if (!tag || (card.dataset.tags || '').split(',').includes(tag)) {
+          card.style.display = '';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+
+      buttons.forEach((btn) => {
+        const isActive = btn.dataset.tag === tag;
+        btn.className = isActive
+          ? 'tag-btn text-sm px-3 py-1 rounded-full border transition-colors bg-[var(--color-accent)] text-white border-[var(--color-accent)]'
+          : 'tag-btn text-sm px-3 py-1 rounded-full border transition-colors bg-[var(--color-surface)] text-[var(--color-text-secondary)] border-[var(--color-border)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]';
+      });
+
+      const url = new URL(window.location);
+      if (tag) { url.searchParams.set('tag', tag); }
+      else { url.searchParams.delete('tag'); }
+      window.history.replaceState({}, '', url);
+    }
+
+    buttons.forEach((btn) => {
+      btn.addEventListener('click', () => filter(btn.dataset.tag || ''));
+    });
+
+    const active = new URLSearchParams(window.location.search).get('tag') || '';
+    filter(active);
+  })();
+</script>
