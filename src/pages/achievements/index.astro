@@ -9,18 +9,19 @@ const allAchievements = (await getCollection('achievements', ({ data }) => !data
 const allTypes = [...new Set(allAchievements.map((a) => a.data.type))];
 
 const typeLabel: Record<string, string> = {
-  paper: 'Papers',
-  project: 'Projects',
-  talk: 'Talks',
-  award: 'Awards',
+  footprints: 'Footprints',
+  contributions: 'Contributions',
   milestone: 'Milestones',
+  breakthrough: 'Breakthroughs',
+  tool: 'Tools',
+  article: 'Articles',
 };
 ---
 
 <Layout title="Achievements — Hoikei Chan" description="Personal achievements and progress log">
   <section class="max-w-3xl mx-auto px-6 py-16">
     <h1 class="font-serif text-3xl font-extrabold text-[var(--color-text)] mb-2">Achievements</h1>
-    <p class="text-[var(--color-text-secondary)] mb-8">Papers, projects, talks, and milestones</p>
+    <p class="text-[var(--color-text-secondary)] mb-8">My journey at the intersection of AI and medicine</p>
 
     <div id="type-filters" class="flex flex-wrap gap-2 mb-8">
       <button data-type="" class="type-btn text-sm px-3 py-1 rounded-full border transition-colors bg-[var(--color-accent)] text-white border-[var(--color-accent)]">

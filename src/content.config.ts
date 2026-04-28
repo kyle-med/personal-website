@@ -21,7 +21,7 @@ const achievementsCollection = defineCollection({
   schema: z.object({
     title: z.string(),
     date: z.date(),
-    type: z.enum(['paper', 'project', 'talk', 'award', 'milestone']),
+    type: z.enum(['footprints', 'contributions', 'milestone', 'breakthrough', 'tool', 'article']),
     draft: z.boolean().default(false),
   }),
 });

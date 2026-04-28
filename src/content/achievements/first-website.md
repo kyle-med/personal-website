@@ -1,7 +1,7 @@
 ---
 title: "借助 Claude Agent 和 DeepSeek 完成了第一个个人网页开发"
 date: 2026-04-28
-type: "milestone"
+type: "footprints"
 draft: false
 ---
 
