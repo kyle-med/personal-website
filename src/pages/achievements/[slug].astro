@@ -1,6 +1,6 @@
 ---
 import Layout from '../../components/Layout.astro';
-import { getCollection } from 'astro:content';
+import { getCollection, render } from 'astro:content';
 
 export async function getStaticPaths() {
   const achievements = await getCollection('achievements', ({ data }) => !data.draft);
@@ -8,6 +8,7 @@ export async function getStaticPaths() {
 }
 
 const { achievement } = Astro.props;
+const { Content } = await render(achievement);
 const { title, date, type } = achievement.data;
 
 const typeLabel: Record<string, string> = {
@@ -36,7 +37,7 @@ const typeLabel: Record<string, string> = {
     </header>
 
     <div class="prose-custom prose prose-slate max-w-none">
-      {achievement.body}
+      <Content />
     </div>
   </article>
 </Layout>
