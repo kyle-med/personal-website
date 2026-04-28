@@ -1,0 +1,42 @@
+---
+import Layout from '../../components/Layout.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const achievements = await getCollection('achievements', ({ data }) => !data.draft);
+  return achievements.map((a) => ({ params: { slug: a.id }, props: { achievement: a } }));
+}
+
+const { achievement } = Astro.props;
+const { title, date, type } = achievement.data;
+
+const typeLabel: Record<string, string> = {
+  paper: 'Paper',
+  project: 'Project',
+  talk: 'Talk',
+  award: 'Award',
+  milestone: 'Milestone',
+};
+---
+
+<Layout title={`${title} — Hoikei Chan`}>
+  <article class="max-w-3xl mx-auto px-6 py-16">
+    <a href="/achievements" class="text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-accent)] transition-colors mb-6 inline-block">&larr; Back to Achievements</a>
+
+    <header class="mb-10">
+      <h1 class="font-serif text-3xl md:text-4xl font-extrabold text-[var(--color-text)] mb-4">{title}</h1>
+      <div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-[var(--color-text-secondary)]">
+        <time datetime={date.toISOString()}>
+          {date.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' })}
+        </time>
+        <span class="text-xs px-2 py-0.5 rounded-full border bg-[var(--color-bg)] border-[var(--color-border)]">
+          {typeLabel[type] || type}
+        </span>
+      </div>
+    </header>
+
+    <div class="prose-custom prose prose-slate max-w-none">
+      {achievement.body}
+    </div>
+  </article>
+</Layout>
