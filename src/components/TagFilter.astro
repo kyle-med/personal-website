@@ -15,10 +15,10 @@ const filterId = gridId + '-tagfilter';
   ))}
 </div>
 
-<script is:inline>
+<script define:vars={{ filterId, gridId }}>
   (function () {
-    const FILTER_ID = '{filterId}';
-    const GRID_ID = '{gridId}';
+    const FILTER_ID = filterId;
+    const GRID_ID = gridId;
 
     const container = document.getElementById(FILTER_ID);
     if (!container) return;
