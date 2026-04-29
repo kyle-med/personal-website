@@ -3,7 +3,7 @@ import tailwind from '@astrojs/tailwind';
 
 export default defineConfig({
   integrations: [tailwind()],
-  site: 'https://hoikei-chan.vercel.app',
+  site: 'https://hoikei.top',
   markdown: {
     shikiConfig: {
       theme: 'github-light',
