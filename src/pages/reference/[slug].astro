@@ -31,10 +31,8 @@ const ScaleComponent = scale.slug === 'gcs-coma-scale' ? GcsComaScale : null;
   </article>
 </Layout>
 
-<script src="https://unpkg.com/vue@3/dist/vue.global.js" is:inline></script>
-
 <script>
-  import { createApp, reactive, computed } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js';
+  import { createApp, reactive, computed } from 'vue';
 
   const mountEl = document.getElementById('gcs-app');
   if (mountEl) {
