@@ -11,4 +11,4 @@ draft: false
 - **Achievements**：我在 AI × 医学领域取得的一些突破，footprints记录的是一些小小的进步和成长，contributions即将记录的是自己在这个领域做出的一些小小贡献和成果（现在还没有这个标签，期待这个标签能早日“显化”在这个网站里lol）
 - **Bedside Reference**：临床常用评分量表工具集，按科室分类，内置 Vue.js 交互式计算器，首位量表为 GCS 昏迷评分
 
-全程通过 AI 辅助完成，包括架构设计、组件开发、搜索集成（Pagefind）、GitHub 部署等完整链路，并解决了静态站点客户端标签筛选、Astro v6 兼容性、Pagefind 搜索 UI API 适配等技术问题。域名 hoikei-chan.vercel.app。
+全程通过 AI 辅助完成，包括架构设计、组件开发、搜索集成（Pagefind）、GitHub 部署等完整链路，并解决了静态站点客户端标签筛选、Astro v6 兼容性、Pagefind 搜索 UI API 适配等技术问题。域名 hoikei.top。
