@@ -19,3 +19,5 @@ draft: false
 ## 成品小猫阵容
 
 内置 4 只猫咪 GIF：波仔、咣当、Bender、胖虎（已去喵星 TuT），支持用户导入自定义猫咪 GIF。默认猫咪数量、大小、工作间隔、休息时长均可配置。
+
+项目开源在 GitHub：[kyle-med/naughty-cat](https://github.com/kyle-med/naughty-cat)
