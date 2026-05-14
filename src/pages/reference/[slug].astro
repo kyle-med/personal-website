@@ -2,6 +2,7 @@
 import Layout from '../../components/Layout.astro';
 import { scales } from '../../data/scales';
 import GcsComaScale from '../../components/scales/GcsComaScale.astro';
+import RifleAkiScale from '../../components/scales/RifleAkiScale.astro';
 
 export function getStaticPaths() {
   return scales.map((scale) => ({ params: { slug: scale.slug }, props: { scale } }));
@@ -9,7 +10,11 @@ export function getStaticPaths() {
 
 const { scale } = Astro.props;
 
-const ScaleComponent = scale.slug === 'gcs-coma-scale' ? GcsComaScale : null;
+const componentMap: Record<string, typeof GcsComaScale> = {
+  'gcs-coma-scale': GcsComaScale,
+  'rifle-aki': RifleAkiScale,
+};
+const ScaleComponent = componentMap[scale.slug] || null;
 ---
 
 <Layout title={`${scale.title} — Bedside Reference`} description={scale.description}>
@@ -35,6 +40,78 @@ const ScaleComponent = scale.slug === 'gcs-coma-scale' ? GcsComaScale : null;
 
 <script>
   import { createApp, reactive, computed } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js';
+
+  const rifleEl = document.getElementById('rifle-app');
+  if (rifleEl) {
+    const stageOrder = { none: 0, R: 1, I: 2, F: 3, L: 4, E: 5 };
+
+    createApp({
+      setup() {
+        const criteria = reactive({ scr: 'none', uo: 'none' });
+
+        const options = {
+          scr: [
+            { stage: 'none', text: '无明显变化', label: '' },
+            { stage: 'R', text: 'SCr ×1.5 或 GFR ↓ >25%', label: 'Risk' },
+            { stage: 'I', text: 'SCr ×2 或 GFR ↓ >50%', label: 'Injury' },
+            { stage: 'F', text: 'SCr ×3 或 GFR ↓ >75%，或 SCr ≥4 mg/dL 急性升高 ≥0.5', label: 'Failure' },
+            { stage: 'L', text: '持续肾功能完全丧失 >4 周', label: 'Loss' },
+            { stage: 'E', text: '终末期肾病 >3 个月', label: 'ESRD' },
+          ],
+          uo: [
+            { stage: 'none', text: '无明显变化', label: '' },
+            { stage: 'R', text: '<0.5 mL/kg/h ×6h', label: 'Risk' },
+            { stage: 'I', text: '<0.5 mL/kg/h ×12h', label: 'Injury' },
+            { stage: 'F', text: '<0.3 mL/kg/h ×24h 或无尿 ×12h', label: 'Failure' },
+          ],
+        };
+
+        const resultStage = computed(() => {
+          const s = stageOrder[criteria.scr];
+          const u = stageOrder[criteria.uo];
+          const worst = Math.max(s, u);
+          if (worst === 0) return '—';
+          const stages = ['none', 'R', 'I', 'F', 'L', 'E'];
+          return stages[worst];
+        });
+
+        const resultDetail = computed(() => {
+          const map = {
+            none: '请选择上方标准',
+            R: 'Risk — 危险期',
+            I: 'Injury — 损伤期',
+            F: 'Failure — 衰竭期',
+            L: 'Loss — 功能丧失期',
+            E: 'ESRD — 终末期肾病',
+          };
+          return map[resultStage.value] || '';
+        });
+
+        const resultColor = computed(() => {
+          const colors = {
+            '—': 'mt-10 p-8 rounded-3xl text-center shadow-lg transition-all duration-500 bg-gray-400 text-white shadow-gray-200',
+            R: 'mt-10 p-8 rounded-3xl text-center shadow-lg transition-all duration-500 bg-yellow-500 text-white shadow-yellow-200',
+            I: 'mt-10 p-8 rounded-3xl text-center shadow-lg transition-all duration-500 bg-orange-500 text-white shadow-orange-200',
+            F: 'mt-10 p-8 rounded-3xl text-center shadow-lg transition-all duration-500 bg-red-500 text-white shadow-red-200',
+            L: 'mt-10 p-8 rounded-3xl text-center shadow-lg transition-all duration-500 bg-red-700 text-white shadow-red-300',
+            E: 'mt-10 p-8 rounded-3xl text-center shadow-lg transition-all duration-500 bg-red-900 text-white shadow-red-400',
+          };
+          return colors[resultStage.value] || colors['—'];
+        });
+
+        function selectedClass(current, val) {
+          const base = 'px-5 py-4 flex justify-between items-center ios-btn border-b border-gray-50 last:border-0';
+          return current === val ? base + ' bg-blue-50' : base;
+        }
+
+        function scoreClass(current, val) {
+          return current === val ? 'text-sm text-blue-600 font-bold' : 'text-sm text-gray-400';
+        }
+
+        return { criteria, options, resultStage, resultDetail, resultColor, selectedClass, scoreClass };
+      },
+    }).mount('#rifle-app');
+  }
 
   const mountEl = document.getElementById('gcs-app');
   if (mountEl) {

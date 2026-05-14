@@ -26,4 +26,11 @@ export const scales: Scale[] = [
     description:
       '格拉斯哥昏迷评分（Glasgow Coma Scale），用于评估患者意识障碍程度，从睁眼、语言、运动三个维度评分，总分 3–15 分。',
   },
+  {
+    slug: 'rifle-aki',
+    title: 'RIFLE 急性肾损伤分期',
+    specialty: '泌尿',
+    description:
+      'RIFLE 标准将 AKI 分为 Risk、Injury、Failure、Loss、ESRD 五级，基于血清肌酐变化和尿量两个维度，取较重者分期。',
+  },
 ];
