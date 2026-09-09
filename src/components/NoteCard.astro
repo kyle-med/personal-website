@@ -2,6 +2,13 @@
 import type { CollectionEntry } from 'astro:content';
 
 const { note } = Astro.props as { note: CollectionEntry<'notes'> };
+const isPaper = note.data.type === 'paper';
+const typeLabel = note.data.label || (isPaper ? '论文笔记' : '选题札记');
+const dateLabel = note.data.date.toLocaleDateString('zh-CN', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
 ---
 
 <a
@@ -11,13 +18,17 @@ const { note } = Astro.props as { note: CollectionEntry<'notes'> };
 >
   <div class="flex items-start justify-between gap-4 mb-2">
     <h3 class="font-serif font-bold text-[var(--color-text)]">{note.data.title}</h3>
-    {note.data.rating && (
+    {isPaper && note.data.rating && (
       <span class="text-sm text-[var(--color-accent)] whitespace-nowrap">{'★'.repeat(note.data.rating)}{'☆'.repeat(5 - note.data.rating)}</span>
     )}
   </div>
-  <p class="text-sm text-[var(--color-text-secondary)] mb-3">
-    {note.data.journal} ({note.data.year}) &middot; {note.data.authors}
-  </p>
+  <div class="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-[var(--color-text-secondary)] mb-3">
+    <span class="font-medium text-[var(--color-accent)]">{typeLabel}</span>
+    <span>&middot;</span>
+    <time datetime={note.data.date.toISOString()}>{dateLabel}</time>
+    {isPaper && note.data.journal && <span>&middot; {note.data.journal}{note.data.year && ` (${note.data.year})`}</span>}
+    {isPaper && note.data.authors && <span>&middot; {note.data.authors}</span>}
+  </div>
   <p class="text-sm text-[var(--color-text-secondary)] leading-relaxed line-clamp-2">{note.data.abstract}</p>
   <div class="flex flex-wrap gap-2 mt-3">
     {note.data.tags.map((tag) => (
